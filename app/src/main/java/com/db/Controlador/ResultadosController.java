@@ -67,7 +67,7 @@ public class ResultadosController {
 		if(!condicion.equals("")){
 			where = " WHERE " + condicion;
 		}
-		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_RESULTADOS + " " + where+" ORDER BY id DESC "+limit, null);
+		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_RESULTADOS + " " + where+" ORDER BY id "+limit, null);
 		countCursor = db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_RESULTADOS + " " + where, null);
 		if (countCursor.moveToFirst()) {
 			do {

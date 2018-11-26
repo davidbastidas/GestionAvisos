@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Vistas.ResultadoActivity">
+    tools:context=".Vistas.AnomaliaActivity">
 
     <EditText
-        android:id="@+id/e_buscar_resultado"
+        android:id="@+id/e_buscar_anomalia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -16,7 +16,7 @@
         android:inputType="textPersonName" />
 
     <ListView
-        android:id="@+id/l_resultados"
+        android:id="@+id/l_anomalias"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

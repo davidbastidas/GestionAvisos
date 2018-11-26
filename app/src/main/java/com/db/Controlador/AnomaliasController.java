@@ -67,7 +67,7 @@ public class AnomaliasController {
 		if(!condicion.equals("")){
 			where = " WHERE " + condicion;
 		}
-		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_ANOMALIAS + " " + where+" ORDER BY id DESC "+limit, null);
+		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_ANOMALIAS + " " + where+" ORDER BY id "+limit, null);
 		countCursor = db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_ANOMALIAS + " " + where, null);
 		if (countCursor.moveToFirst()) {
 			do {

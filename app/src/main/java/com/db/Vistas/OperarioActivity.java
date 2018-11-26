@@ -2,6 +2,7 @@ package com.db.Vistas;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import com.db.Modelos.EntidadesPago;
 import com.db.Modelos.ObservacionRapida;
 import com.db.Modelos.Resultados;
 import com.db.Modelos.SesionSingleton;
+import com.db.Modelos.VisitaSesion;
 import com.db.Modelos.Visitas;
 import com.db.R;
 
@@ -36,9 +38,12 @@ import java.util.ArrayList;
 public class OperarioActivity extends AppCompatActivity {
 
     Button b_buscar, b_barrios, b_visitas;
-    TextView t_reporte, t_acerca;
+    TextView t_reporte, t_acerca, t_perfil;
     ProgressDialog progressDialog = null;
     Activity actividad;
+    Visitas visitaEnviar = null;
+    private int sizeVisitas = 0;
+    GestorConexion conexionGestor = new GestorConexion();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,8 @@ public class OperarioActivity extends AppCompatActivity {
         b_visitas = findViewById(R.id.b_visitas);
         t_reporte = findViewById(R.id.t_reporte);
         t_acerca = findViewById(R.id.t_acerca);
+        t_perfil = findViewById(R.id.t_perfil);
+        t_perfil.setText("Bienvenido. " + SesionSingleton.getInstance().getNombreUsuario());
 
         b_buscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +75,7 @@ public class OperarioActivity extends AppCompatActivity {
         b_visitas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentar = new Intent(actividad, OperarioActivity.class);
+                Intent intentar = new Intent(actividad, VisitasActivity.class);
                 actividad.startActivity(intentar);
             }
         });
@@ -80,6 +87,7 @@ public class OperarioActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        enviarVisitas();
         mostrarReporte();
     }
 
@@ -99,20 +107,16 @@ public class OperarioActivity extends AppCompatActivity {
                     @Override
                     protected String doInBackground(String... params) {
                         GestorConexion con = new GestorConexion();
-                        con.descargarVisitas(SesionSingleton.getInstance().getFkId());
-                        return "";
+                        return con.descargarVisitas(SesionSingleton.getInstance().getFkId());
                     }
                     @Override
                     protected void onPostExecute(String result) {
                         alFinalizarDescargaVisitas(result);
                     }
                 }.execute();
-                progressDialog.dismiss();
                 return true;
             case R.id.sincronizar:
-                progressDialog = Constants.dialogIndeterminate(this, "Sincronizando...");
-
-                progressDialog.dismiss();
+                enviarVisitas();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -121,9 +125,13 @@ public class OperarioActivity extends AppCompatActivity {
 
     private void mostrarReporte() {
         VisitasController visitas = new VisitasController();
+        int realizadas = visitas.count("estado = 1", this);
+        int pendientes = visitas.count("estado = 0", this);
+        int enviadas = visitas.count("last_insert > 0", this);
         t_reporte.setText(
-                "Visitas Realizadas= " + visitas.count("", this)+"\n"+
-                "Visitas Enviadas= " + visitas.count("last_insert > 0", this)
+                "Visitas Realizadas= " + realizadas+"\n"+
+                "Visitas Pendientes= " + pendientes + "\n" +
+                "Visitas Enviadas= " + enviadas
         );
     }
 
@@ -135,12 +143,15 @@ public class OperarioActivity extends AppCompatActivity {
 
     private void alFinalizarDescargaVisitas(String result) {
         System.out.println("alFinalizarDescargaVisitas= " + result);
+        result = "{\"array\":" + result + "}";
         SesionSingleton se = SesionSingleton.getInstance();
         VisitasController vis = new VisitasController();
         JSONObject json_data = null;
-        boolean flag = false;
-        try{
+        boolean flag = true;
+        try {
             json_data = new JSONObject(result);
+            JSONArray jsonArray = json_data.getJSONArray("array");
+            json_data = new JSONObject(jsonArray.get(0).toString());
             if(json_data.getBoolean("estado")){
                 flag = true;
             }else{
@@ -148,7 +159,7 @@ public class OperarioActivity extends AppCompatActivity {
             }
         } catch (Exception e){
             Toast.makeText(this, Constants.MSG_FORMATO_NO_VALIDO + e, Toast.LENGTH_LONG).show();
-        }finally {
+        } finally {
 
         }
 
@@ -187,7 +198,7 @@ public class OperarioActivity extends AppCompatActivity {
                 }
 
                 //insertando la tabla entidades pago
-                JSONArray jArrayEntidades = json_data.getJSONArray("entidades_pago");
+                JSONArray jArrayEntidades = json_data.getJSONArray("entidades");
                 size = jArrayEntidades.length();
                 EntidadesPagoController entCon = new EntidadesPagoController();
                 EntidadesPago entidad = null;
@@ -232,6 +243,7 @@ public class OperarioActivity extends AppCompatActivity {
                     visita.setMunicipio(tr.getString("municipio"));
                     visita.setLocalidad(tr.getString("localidad"));
                     visita.setBarrio(tr.getString("barrio"));
+                    visita.setDireccion(tr.getString("direccion"));
                     visita.setCliente(tr.getString("cliente"));
                     visita.setDeuda(tr.getLong("deuda"));
                     visita.setFacturas(tr.getInt("factura_vencida"));
@@ -250,7 +262,7 @@ public class OperarioActivity extends AppCompatActivity {
                     visita.setTitularPago("");
                     visita.setTelefono("");
                     visita.setEmail("");
-                    visita.setObservacionRapida("");
+                    visita.setObservacionRapida(0);
                     visita.setObservacionAnalisis("");
                     visita.setLectura("");
                     visita.setLatitud("");
@@ -273,6 +285,81 @@ public class OperarioActivity extends AppCompatActivity {
             Toast.makeText(this, Constants.MSG_LEYENDO_DATOS + "de la visita. " + e, Toast.LENGTH_LONG).show();
         } finally {
             progressDialog.dismiss();
+            mostrarReporte();
         }
+    }
+
+    private void enviarVisitas() {
+        VisitasController vis = new VisitasController();
+        ArrayList<Visitas> arrayVisitas = vis.consultar(0, 0, "estado = 1 and last_insert = 0", this);
+        sizeVisitas = arrayVisitas.size();
+        if(sizeVisitas > 0){
+            progressDialog = Constants.dialogIndeterminate(this, "Sincronizando...");
+            new AsyncTask<String, Void, String>(){
+                @Override
+                protected String doInBackground(String... params) {
+                    return iniciarSincronizacion();
+                }
+                @Override
+                protected void onPostExecute(String result) {
+                    alFinalizarSincronizacion(result);
+                }
+            }.execute();
+        }
+    }
+
+    private String iniciarSincronizacion(){
+        VisitasController vis = new VisitasController();
+        ArrayList<Visitas> arrayVisitas = vis.consultar(0, 0, "estado = 1 and last_insert = 0", this);
+        sizeVisitas = arrayVisitas.size();
+        for (int i = 0; i < sizeVisitas; i++){
+            visitaEnviar = new Visitas();
+            visitaEnviar.setId(arrayVisitas.get(i).getId());
+            visitaEnviar.setResultado(arrayVisitas.get(i).getResultado());
+            visitaEnviar.setAnomalia(arrayVisitas.get(i).getAnomalia());
+            visitaEnviar.setEntidadRecaudo(arrayVisitas.get(i).getEntidadRecaudo());
+            visitaEnviar.setFechaPago(arrayVisitas.get(i).getFechaPago());
+            visitaEnviar.setFechaCompromiso(arrayVisitas.get(i).getFechaCompromiso());
+            visitaEnviar.setPersonaContacto(arrayVisitas.get(i).getPersonaContacto());
+            visitaEnviar.setCedula(arrayVisitas.get(i).getCedula());
+            visitaEnviar.setTitularPago(arrayVisitas.get(i).getTitularPago());
+            visitaEnviar.setTelefono(arrayVisitas.get(i).getTelefono());
+            visitaEnviar.setEmail(arrayVisitas.get(i).getEmail());
+            visitaEnviar.setObservacionRapida(arrayVisitas.get(i).getObservacionRapida());
+            visitaEnviar.setLectura(arrayVisitas.get(i).getLectura());
+            visitaEnviar.setObservacionAnalisis(arrayVisitas.get(i).getObservacionAnalisis());
+            visitaEnviar.setLatitud(arrayVisitas.get(i).getLatitud());
+            visitaEnviar.setLongitud(arrayVisitas.get(i).getLongitud());
+            visitaEnviar.setOrden(arrayVisitas.get(i).getOrden());
+            String response = conexionGestor.enviarVisita(visitaEnviar, SesionSingleton.getInstance().getFkId());
+            System.err.println("response: " + response);
+            try {
+                JSONObject json_data = new JSONObject(response);
+                if (json_data.getBoolean("estado")) {
+                    ContentValues registro = new ContentValues();
+                    registro.put("last_insert", 1);
+                    vis.actualizar(registro, "id = " + visitaEnviar.getId(), OperarioActivity.this);
+                }
+            } catch (final Exception e){
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(
+                                OperarioActivity.this,
+                                Constants.MSG_SINCRONIZACION + "\n" + e,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            } finally {
+
+            }
+        }
+
+        return "Sincronizacion finalizada.";
+    }
+
+    private void alFinalizarSincronizacion(String result) {
+        System.out.println("alFinalizarSincronizacion= " + result);
+        progressDialog.dismiss();
+        Toast.makeText(this, result, Toast.LENGTH_LONG).show();
     }
 }

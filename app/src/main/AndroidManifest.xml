@@ -2,6 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.db">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,8 +30,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".Vistas.AdminActivity" />
+        <activity android:name=".Vistas.AnomaliaActivity" />
+        <activity android:name=".Vistas.DatosClienteActivity" />
+        <activity android:name=".Vistas.DetalleActivity" />
+        <activity android:name=".Vistas.EntidadesActivity" />
+        <activity android:name=".Vistas.ObservacionActivity" />
         <activity android:name=".Vistas.OperarioActivity" />
-        <activity android:name=".Vistas.VisitasActivity"></activity>
+        <activity android:name=".Vistas.ResultadoActivity" />
+        <activity android:name=".Vistas.VisitasActivity" />
     </application>
 
 </manifest>

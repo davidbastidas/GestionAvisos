@@ -101,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 protected String doInBackground(String... params) {
                     GestorConexion con = new GestorConexion();
-                    con.login(usuario, pass);
-                    return "";
+                    return con.login(usuario, pass);
                 }
                 @Override
                 protected void onPostExecute(String result) {
@@ -201,11 +200,11 @@ public class MainActivity extends AppCompatActivity {
         SesionSingleton sesion = SesionSingleton.getInstance();
         SharedPreferences.Editor editor = preferencias.edit();
         if(preferencias.getString(Constants.IP, "").equals("")){
-            editor.putString(Constants.IP, "186.159.113.202:8087");
+            editor.putString(Constants.IP, "52.14.94.46");
             //editor.putString("ip", "192.168.0.131");
         }
         if(preferencias.getString(Constants.RUTAWEB, "").equals("")){
-            editor.putString(Constants.RUTAWEB, "control");
+            editor.putString(Constants.RUTAWEB, "operativa/public");
         }
         editor.commit();
 

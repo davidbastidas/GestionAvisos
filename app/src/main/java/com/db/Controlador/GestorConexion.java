@@ -2,6 +2,8 @@ package com.db.Controlador;
 
 
 import com.db.Modelos.Constants;
+import com.db.Modelos.VisitaSesion;
+import com.db.Modelos.Visitas;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +32,33 @@ public class GestorConexion {
         try {
             obj.put("user", userId);
             return peticionWeb(Constants.ROUTE_VISITAS, obj);
+        } catch (JSONException e) {
+            return "" + e;
+        }
+    }
+
+    public String enviarVisita(Visitas visita, int userId){
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("user", userId);
+            obj.put("id", visita.getId());
+            obj.put("resultado", visita.getResultado());
+            obj.put("anomalia", visita.getAnomalia());
+            obj.put("entidad_recaudo", visita.getEntidadRecaudo());
+            obj.put("fecha_pago", visita.getFechaPago());
+            obj.put("fecha_compromiso", visita.getFechaCompromiso());
+            obj.put("persona_contacto", visita.getPersonaContacto());
+            obj.put("cedula", visita.getCedula());
+            obj.put("titular_pago", visita.getTitularPago());
+            obj.put("telefono", visita.getTelefono());
+            obj.put("correo_electronico", visita.getEmail());
+            obj.put("observacion_rapida", visita.getObservacionRapida());
+            obj.put("lectura", visita.getLectura());
+            obj.put("observacion_analisis", visita.getObservacionAnalisis());
+            obj.put("latitud", visita.getLatitud());
+            obj.put("longitud", visita.getLongitud());
+            obj.put("orden_realizado", visita.getOrden());
+            return peticionWeb(Constants.ROUTE_ACTUALIZAR_VISITA, obj);
         } catch (JSONException e) {
             return "" + e;
         }
@@ -69,7 +98,7 @@ public class GestorConexion {
             respuesta = response.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "" +e;
         } finally {
             if(connection != null) {
                 connection.disconnect();

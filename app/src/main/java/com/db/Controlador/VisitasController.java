@@ -32,6 +32,7 @@ public class VisitasController {
 			registro.put("municipio", visita.getMunicipio());
 			registro.put("localidad", visita.getLocalidad());
 			registro.put("barrio", visita.getBarrio());
+			registro.put("direccion", visita.getDireccion());
 			registro.put("cliente", visita.getCliente());
 			registro.put("deuda", visita.getDeuda());
 			registro.put("facturas", visita.getFacturas());
@@ -105,7 +106,7 @@ public class VisitasController {
 		if(!condicion.equals("")){
 			where = " WHERE " + condicion;
 		}
-		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_VISITAS + " " + where+" ORDER BY id DESC "+limit, null);
+		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_VISITAS + " " + where+" ORDER BY id "+limit, null);
 		countCursor = db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_VISITAS + " " + where, null);
 		if (countCursor.moveToFirst()) {
 			do {
@@ -120,36 +121,37 @@ public class VisitasController {
 				dataSet.setMunicipio(c.getString(2));
 				dataSet.setLocalidad(c.getString(3));
 				dataSet.setBarrio(c.getString(4));
-				dataSet.setCliente(c.getString(5));
-				dataSet.setDeuda(c.getLong(6));
-				dataSet.setFacturas(c.getLong(7));
-				dataSet.setNic(c.getLong(8));
-				dataSet.setNis(c.getLong(9));
-				dataSet.setMedidor(c.getString(10));
-				dataSet.setTarifa(c.getString(11));
-				dataSet.setFechaLimiteCompromiso(c.getString(12));
-				dataSet.setResultado(c.getLong(13));
-				dataSet.setAnomalia(c.getLong(14));
-				dataSet.setEntidadRecaudo(c.getLong(15));
-				dataSet.setFechaPago(c.getString(16));
-				dataSet.setFechaCompromiso(c.getString(17));
-				dataSet.setPersonaContacto(c.getString(18));
-				dataSet.setCedula(c.getString(19));
-				dataSet.setTitularPago(c.getString(20));
-				dataSet.setTelefono(c.getString(21));
-				dataSet.setEmail(c.getString(22));
-				dataSet.setObservacionRapida(c.getString(23));
-				dataSet.setObservacionAnalisis(c.getString(24));
-				dataSet.setLectura(c.getString(25));
-				dataSet.setLatitud(c.getString(26));
-				dataSet.setLongitud(c.getString(27));
-				dataSet.setOrden(c.getLong(28));
-				dataSet.setFoto(c.getString(29));
-				dataSet.setFechaRealizado(c.getString(30));
-				dataSet.setGestorAsignadoId(c.getLong(31));
-				dataSet.setGestorRealizaId(c.getLong(32));
-				dataSet.setEstado(c.getLong(33));
-				dataSet.setLastInsert(c.getLong(34));
+				dataSet.setDireccion(c.getString(5));
+				dataSet.setCliente(c.getString(6));
+				dataSet.setDeuda(c.getLong(7));
+				dataSet.setFacturas(c.getLong(8));
+				dataSet.setNic(c.getLong(9));
+				dataSet.setNis(c.getLong(10));
+				dataSet.setMedidor(c.getString(11));
+				dataSet.setTarifa(c.getString(12));
+				dataSet.setFechaLimiteCompromiso(c.getString(13));
+				dataSet.setResultado(c.getLong(14));
+				dataSet.setAnomalia(c.getLong(15));
+				dataSet.setEntidadRecaudo(c.getLong(16));
+				dataSet.setFechaPago(c.getString(17));
+				dataSet.setFechaCompromiso(c.getString(18));
+				dataSet.setPersonaContacto(c.getString(19));
+				dataSet.setCedula(c.getString(20));
+				dataSet.setTitularPago(c.getString(21));
+				dataSet.setTelefono(c.getString(22));
+				dataSet.setEmail(c.getString(23));
+				dataSet.setObservacionRapida(c.getLong(24));
+				dataSet.setObservacionAnalisis(c.getString(25));
+				dataSet.setLectura(c.getString(26));
+				dataSet.setLatitud(c.getString(27));
+				dataSet.setLongitud(c.getString(28));
+				dataSet.setOrden(c.getLong(29));
+				dataSet.setFoto(c.getString(30));
+				dataSet.setFechaRealizado(c.getString(31));
+				dataSet.setGestorAsignadoId(c.getLong(32));
+				dataSet.setGestorRealizaId(c.getLong(33));
+				dataSet.setEstado(c.getLong(34));
+				dataSet.setLastInsert(c.getLong(35));
 				visitas.add(dataSet);
 			} while (c.moveToNext());
 		}
@@ -166,6 +168,20 @@ public class VisitasController {
 			where = " WHERE "+condicion;
 		}
 		countCursor=db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_VISITAS + " " + where, null);
+		if (countCursor.moveToFirst()) {
+			do {
+				tamanoConsulta = countCursor.getInt(0);
+			} while (countCursor.moveToNext());
+		}
+		countCursor.close();
+		return tamanoConsulta;
+	}
+
+	public int ultimoOrden(Activity activity){
+		Cursor countCursor = null;
+		SQLite usdbh = SQLite.getInstance(activity);
+		SQLiteDatabase db = usdbh.getMyWritableDatabase();
+		countCursor = db.rawQuery("SELECT max(orden) FROM " + Constants.TABLA_VISITAS, null);
 		if (countCursor.moveToFirst()) {
 			do {
 				tamanoConsulta = countCursor.getInt(0);

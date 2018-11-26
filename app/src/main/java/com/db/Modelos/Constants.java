@@ -10,6 +10,23 @@ public final class Constants {
     private static SesionSingleton sesion = SesionSingleton.getInstance();
 
     public static final int PERMISOS_REQUEST_CODE = 100;
+    public static final int VISITA_REQUEST_CODE = 999;
+    public static final int FOTO_REQUEST_CODE = 998;
+
+    /**resultados*/
+    public static final int RES_CONTACTO_NO_EFECTIVO = 1;
+    public static final int RES_CONTACTO_EFECTIVO = 2;
+    public static final int RES_ACUERDO_PAGO = 3;
+    public static final int RES_ABONO = 4;
+    public static final int RES_CLIENTE_CANCELO = 5;
+    public static final int RES_REGISTRO_NO_VALIDO = 6;
+    public static final int RES_DEUDA_CERO = 7;
+    public static final int RES_EVALUAR_CAPACIDAD_OPERATIVA = 8;
+    public static final int RES_GESTION_NO_PROCEDE = 9;
+    public static final int RES_EN_CURSO = 10;
+    public static final int RES_REPROGRAMACION = 11;
+
+    public static final String EXTRA_VISITA_ID = "visita_id";
 
     public static final String DB_NAME = "db_gestion";
     public static final String TABLA_USUARIOS = "usuarios";
@@ -30,9 +47,10 @@ public final class Constants {
 
     /** url*/
     //ip/control/api/public/--ruta de el controlador--/
-    private static String URL_BASE = "http://" + sesion.getIp() + File.separator + sesion.getRuta() + File.separator +  "api" + File.separator +  "public" + File.separator;
-    public static final String ROUTE_LOGIN = URL_BASE + "site/login";
-    public static final String ROUTE_VISITAS = URL_BASE + "site/login";
+    private static String URL_BASE = "http://" + sesion.getIp() + File.separator + sesion.getRuta() + File.separator +  "api" + File.separator;
+    public static final String ROUTE_LOGIN = URL_BASE + "login";
+    public static final String ROUTE_VISITAS = URL_BASE + "avisos/getVisitas";
+    public static final String ROUTE_ACTUALIZAR_VISITA = URL_BASE + "avisos/actualizarVisita";
 
     public static ProgressDialog dialogIndeterminate(Context context, String mensaje){
         ProgressDialog pd = new ProgressDialog(context);
@@ -46,6 +64,8 @@ public final class Constants {
 
     /** mensajes estandar*/
     public static final String MSG_FORMATO_NO_VALIDO = "El formato de respuesta no es valido.";
+    public static final String MSG_SINCRONIZACION = "La visita no se pudo enviar.";
     public static final String MSG_PETICION_RECHAZADA = "Peticion Rechazada.";
     public static final String MSG_LEYENDO_DATOS = "Ocurrio un error leyendo los datos ";
+    public static final String MSG_ENVIO_VISITA = "Visita enviada con exito!.";
 }

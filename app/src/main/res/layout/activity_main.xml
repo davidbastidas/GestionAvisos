@@ -33,6 +33,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="@string/usuario"
+                android:inputType="number"
                 android:maxLength="15"
                 android:singleLine="true" />
 

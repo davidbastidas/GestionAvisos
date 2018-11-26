@@ -1,6 +1,20 @@
 package com.db.Modelos;
 
-public class Visitas {
+public class VisitaSesion {
+
+    private static VisitaSesion mInstance;
+
+    public static VisitaSesion getInstance() {
+        if (mInstance == null) {
+            mInstance = new VisitaSesion();
+        }
+        return mInstance;
+    }
+
+    public static void resetSesion() {
+        mInstance = null;
+    }
+
     private long id;
     private String tipoVisita;
     private String municipio;

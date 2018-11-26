@@ -67,7 +67,7 @@ public class EntidadesPagoController {
 		if(!condicion.equals("")){
 			where = " WHERE " + condicion;
 		}
-		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_ENTIDADES_PAGO + " " + where+" ORDER BY id DESC "+limit, null);
+		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_ENTIDADES_PAGO + " " + where+" ORDER BY nombre "+limit, null);
 		countCursor = db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_ENTIDADES_PAGO + " " + where, null);
 		if (countCursor.moveToFirst()) {
 			do {

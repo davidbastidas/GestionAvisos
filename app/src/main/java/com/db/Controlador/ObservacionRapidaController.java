@@ -67,7 +67,7 @@ public class ObservacionRapidaController {
 		if(!condicion.equals("")){
 			where = " WHERE " + condicion;
 		}
-		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_OBSERVACION_RAPIDA + " " + where+" ORDER BY id DESC "+limit, null);
+		c = db.rawQuery("SELECT * FROM " + Constants.TABLA_OBSERVACION_RAPIDA + " " + where+" ORDER BY id "+limit, null);
 		countCursor = db.rawQuery("SELECT count(id) FROM " + Constants.TABLA_OBSERVACION_RAPIDA + " " + where, null);
 		if (countCursor.moveToFirst()) {
 			do {

@@ -20,7 +20,7 @@ public class AdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-
+        setTitle("Administracion de la App");
         final SharedPreferences preferencias = getSharedPreferences(Constants.CONFIGURACION,
                 Context.MODE_PRIVATE);
         final SesionSingleton sesion = SesionSingleton.getInstance();

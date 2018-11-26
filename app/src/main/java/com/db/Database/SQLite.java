@@ -67,6 +67,7 @@ public class SQLite extends SQLiteOpenHelper {
 				" municipio TEXT," +
 				" localidad TEXT," +
 				" barrio TEXT," +
+				" direccion TEXT," +
 				" cliente TEXT," +
 				" deuda INTEGER," +
 				" facturas INTEGER," +
@@ -85,7 +86,7 @@ public class SQLite extends SQLiteOpenHelper {
 				" titular_pago TEXT," +
 				" telefono TEXT," +
 				" email TEXT," +
-				" observacion_rapida TEXT," +
+				" observacion_rapida INTEGER," +
 				" observacion_analisis TEXT," +
 				" lectura TEXT," +
 				" latitud TEXT," +
