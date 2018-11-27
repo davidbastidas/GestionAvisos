@@ -1,21 +1,29 @@
 package com.db.Vistas;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.db.Controlador.VisitasController;
 import com.db.Modelos.Constants;
 import com.db.Modelos.SesionSingleton;
+import com.db.Modelos.Visitas;
 import com.db.R;
+
+import java.util.ArrayList;
 
 public class AdminActivity extends AppCompatActivity {
 
     EditText e_ip, e_ruta_web;
-    Button b_borrar_datos, b_guardar_settings;
+    Button b_borrar_datos, b_guardar_settings, b_desbloquear_visitas;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +38,7 @@ public class AdminActivity extends AppCompatActivity {
         e_ruta_web = findViewById(R.id.e_ruta_web);
         b_borrar_datos = findViewById(R.id.b_borrar_datos);
         b_guardar_settings = findViewById(R.id.b_guardar_settings);
+        b_desbloquear_visitas = findViewById(R.id.b_desbloquear_visitas);
 
         e_ip.setText(preferencias.getString(Constants.IP, ""));
         e_ruta_web.setText(preferencias.getString(Constants.RUTAWEB, ""));
@@ -37,7 +46,25 @@ public class AdminActivity extends AppCompatActivity {
         b_borrar_datos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                VisitasController vis = new VisitasController();
+                                vis.eliminarTodo(AdminActivity.this);
+                                break;
 
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
+                builder.setMessage("Esta seguro de eliminar todo?").setPositiveButton("Si", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
             }
         });
 
@@ -55,6 +82,40 @@ public class AdminActivity extends AppCompatActivity {
                 sesion.setRuta(e_ruta_web.getText().toString());
 
                 finish();
+            }
+        });
+
+        b_desbloquear_visitas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                VisitasController vis = new VisitasController();
+                                ArrayList<Visitas> consultar = vis.consultar(0, 0, "", AdminActivity.this);
+                                ContentValues registro = new ContentValues();
+                                registro.put("last_insert", 0);
+                                for (int i = 0; i < consultar.size(); i++){
+                                    vis.actualizar(registro, "id = " + consultar.get(i).getId(), AdminActivity.this);
+                                }
+                                Toast.makeText(
+                                        AdminActivity.this,
+                                        "Se restablecieron las visitas",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
+                builder.setMessage("Esta seguro de restablecer las visitas?").setPositiveButton("Si", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
             }
         });
     }

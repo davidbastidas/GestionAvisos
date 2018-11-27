@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 
 public class VisitasActivity extends AppCompatActivity {
 
-    ImageButton ib_primero, ib_anterior, ib_siguiente, ib_ultimo;
     TextView t_pagina;
     ListView l_visitas;
     VisitasController vis = null;
@@ -33,14 +33,59 @@ public class VisitasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_visitas);
         setTitle("Lista de Visitas");
 
-        ib_primero = findViewById(R.id.ib_primero);
-        ib_anterior = findViewById(R.id.ib_anterior);
-        ib_siguiente = findViewById(R.id.ib_siguiente);
-        ib_ultimo = findViewById(R.id.ib_ultimo);
         t_pagina = findViewById(R.id.t_pagina);
         l_visitas = findViewById(R.id.l_visitas);
 
-        cargarLista();
+        Bundle extras = getIntent().getExtras();
+        if(extras == null) {
+            cargarLista();
+        } else {
+            if(!extras.getString(Constants.EXTRA_BARRIO).equals("")){//por barrio
+                String barrio = extras.getString(Constants.EXTRA_BARRIO);
+                barrio = " and barrio like '%" + barrio + "%'";
+                vis = new VisitasController();
+                System.err.println("barrio: " + barrio);
+                ArrayList<Visitas> visitas = vis.consultar(
+                        0,
+                        0,
+                        "estado = 0 " + barrio,
+                        this);
+                AdapterVisitas adapter = new AdapterVisitas(this, visitas);
+                l_visitas.setAdapter(adapter);
+                t_pagina.setText(visitas.size() + " Visitas por Barrio");
+            } else{
+                String nic = extras.getString(Constants.EXTRA_NIC);
+                String medidor = extras.getString(Constants.EXTRA_MEDIDOR);
+                String direccion = extras.getString(Constants.EXTRA_DIRECCION);
+                boolean realizados = extras.getBoolean(Constants.EXTRA_REALIZADO);
+
+                if(!nic.equals("")){
+                    nic = " and nic like '%" + nic + "%'";
+                }
+                if(!medidor.equals("")){
+                    medidor = " and medidor like '%" + medidor + "%'";
+                }
+                if(!direccion.equals("")){
+                    direccion = " and direccion like '%" + direccion + "%'";
+                }
+                int rel = 0;
+                if(realizados){
+                    rel = 1;
+                }
+                vis = new VisitasController();
+                System.err.println("buscar: " + nic + medidor  + direccion + rel);
+                ArrayList<Visitas> visitas = vis.consultar(
+                        0,
+                        0,
+                        "estado = " + rel + nic + medidor + direccion,
+                        this);
+                AdapterVisitas adapter = new AdapterVisitas(this, visitas);
+                l_visitas.setAdapter(adapter);
+                t_pagina.setText(visitas.size() + " Visitas Encontradas");
+            }
+        }
+
+
         l_visitas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -56,46 +101,24 @@ public class VisitasActivity extends AppCompatActivity {
                 }
             }
         });
-
-        ib_primero.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        ib_anterior.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        ib_siguiente.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        ib_ultimo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     private void cargarLista(){
         vis = new VisitasController();
-        ArrayList<Visitas> visitas = vis.consultar(0, 15, "estado=0", this);
+        ArrayList<Visitas> visitas = vis.consultar(0, 0, "estado=0", this);
         AdapterVisitas adapter = new AdapterVisitas(this, visitas);
         l_visitas.setAdapter(adapter);
+        t_pagina.setText(visitas.size() + " Visitas");
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        cargarLista();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.VISITA_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                Intent returnIntent = new Intent();
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+        }
     }
 }

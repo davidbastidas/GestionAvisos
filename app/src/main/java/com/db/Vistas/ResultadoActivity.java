@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.db.Controlador.ResultadosController;
+import com.db.Controlador.VisitasController;
 import com.db.Modelos.Constants;
 import com.db.Modelos.Resultados;
 import com.db.Modelos.VisitaSesion;
@@ -23,7 +24,10 @@ import com.db.Modelos.Visitas;
 import com.db.R;
 import com.db.Vistas.Adaptader.AdapterResultados;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ResultadoActivity extends AppCompatActivity {
 
@@ -90,33 +94,40 @@ public class ResultadoActivity extends AppCompatActivity {
 
                 actividad = AnomaliaActivity.class;
                 break;
-            case Constants.RES_CONTACTO_EFECTIVO:
-                visita.setResultado(Constants.RES_CONTACTO_EFECTIVO);
-                visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
-                actividad = DatosClienteActivity.class;
-                break;
             case Constants.RES_ACUERDO_PAGO:
                 //la fecha se toma de la fecha precargada
                 visita.setResultado(Constants.RES_ACUERDO_PAGO);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
+                visita.setAnomalia(10);
+                VisitasController vis = new VisitasController();
+                ArrayList<Visitas> visitas = vis.consultar(0, 0, "id=" + visita.getId(), this);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyy-MM-dd");
+                Date convertedDate = new Date();
+                try {
+                    convertedDate = dateFormat.parse(visitas.get(0).getFechaLimiteCompromiso());
+                    String date = new SimpleDateFormat("dd/MM/yyyy")
+                            .format(convertedDate);
+                    visita.setFechaCompromiso(date);
+                } catch (ParseException e) {
+                    visita.setFechaCompromiso("");
+                    Toast.makeText(this, "No se pudo convertir la fecha: " + visitas.get(0).getFechaLimiteCompromiso(), Toast.LENGTH_LONG).show();
+                }
+                Toast.makeText(this, "Fecha de compromiso: " + visita.getFechaCompromiso(), Toast.LENGTH_LONG).show();
                 actividad = DatosClienteActivity.class;
                 break;
             case Constants.RES_ABONO:
                 visita.setResultado(Constants.RES_ABONO);
-                visita.setAnomalia(0);
+                visita.setAnomalia(10);
                 actividad = EntidadesActivity.class;
                 break;
             case Constants.RES_CLIENTE_CANCELO:
                 visita.setResultado(Constants.RES_CLIENTE_CANCELO);
-                visita.setAnomalia(0);
+                visita.setAnomalia(10);
                 actividad = EntidadesActivity.class;
                 break;
             case Constants.RES_REGISTRO_NO_VALIDO:
                 visita.setResultado(Constants.RES_REGISTRO_NO_VALIDO);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
 
                 visita.setCedula("");
                 visita.setTitularPago("");
@@ -127,18 +138,17 @@ public class ResultadoActivity extends AppCompatActivity {
                 visita.setFechaCompromiso("");
                 visita.setFechaPago("");
 
-                actividad = ObservacionActivity.class;
+                actividad = AnomaliaActivity.class;
                 break;
             case Constants.RES_DEUDA_CERO:
                 visita.setResultado(Constants.RES_DEUDA_CERO);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
+                visita.setAnomalia(10);
                 actividad = DatosClienteActivity.class;
                 break;
             case Constants.RES_EVALUAR_CAPACIDAD_OPERATIVA:
                 visita.setResultado(Constants.RES_EVALUAR_CAPACIDAD_OPERATIVA);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
 
                 visita.setCedula("");
                 visita.setTitularPago("");
@@ -149,12 +159,11 @@ public class ResultadoActivity extends AppCompatActivity {
                 visita.setFechaCompromiso("");
                 visita.setFechaPago("");
 
-                actividad = ObservacionActivity.class;
+                actividad = AnomaliaActivity.class;
                 break;
             case Constants.RES_GESTION_NO_PROCEDE:
                 visita.setResultado(Constants.RES_GESTION_NO_PROCEDE);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
 
                 visita.setCedula("");
                 visita.setTitularPago("");
@@ -165,12 +174,12 @@ public class ResultadoActivity extends AppCompatActivity {
                 visita.setFechaCompromiso("");
                 visita.setFechaPago("");
 
-                actividad = ObservacionActivity.class;
+                actividad = AnomaliaActivity.class;
                 break;
             case Constants.RES_EN_CURSO:
                 visita.setResultado(Constants.RES_EN_CURSO);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
+                visita.setAnomalia(10);
 
                 visita.setCedula("");
                 visita.setTitularPago("");
@@ -186,7 +195,6 @@ public class ResultadoActivity extends AppCompatActivity {
             case Constants.RES_REPROGRAMACION:
                 visita.setResultado(Constants.RES_REPROGRAMACION);
                 visita.setEntidadRecaudo(0);
-                visita.setAnomalia(0);
 
                 visita.setCedula("");
                 visita.setTitularPago("");
@@ -197,7 +205,7 @@ public class ResultadoActivity extends AppCompatActivity {
                 visita.setFechaCompromiso("");
                 visita.setFechaPago("");
 
-                actividad = ObservacionActivity.class;
+                actividad = AnomaliaActivity.class;
                 break;
         }
 

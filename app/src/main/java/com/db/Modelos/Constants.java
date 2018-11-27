@@ -15,7 +15,6 @@ public final class Constants {
 
     /**resultados*/
     public static final int RES_CONTACTO_NO_EFECTIVO = 1;
-    public static final int RES_CONTACTO_EFECTIVO = 2;
     public static final int RES_ACUERDO_PAGO = 3;
     public static final int RES_ABONO = 4;
     public static final int RES_CLIENTE_CANCELO = 5;
@@ -27,6 +26,11 @@ public final class Constants {
     public static final int RES_REPROGRAMACION = 11;
 
     public static final String EXTRA_VISITA_ID = "visita_id";
+    public static final String EXTRA_NIC = "nic";
+    public static final String EXTRA_MEDIDOR = "medidor";
+    public static final String EXTRA_DIRECCION = "direccion";
+    public static final String EXTRA_REALIZADO = "realizado";
+    public static final String EXTRA_BARRIO = "barrio";
 
     public static final String DB_NAME = "db_gestion";
     public static final String TABLA_USUARIOS = "usuarios";

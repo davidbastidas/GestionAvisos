@@ -61,11 +61,10 @@ public class MainActivity extends AppCompatActivity {
         final String pass = e_contrasena.getText().toString().trim();
 
         Intent intentar = null;
-        if(usuario.equals("admin") && !pass.equals("")){
+        if(usuario.equals("0000") && !pass.equals("")){
             if (pass.length() == 8) {
                 String sub = pass.substring(4, 8);
                 if (sub.equals("0000")) {
-                    // resetear la contrase�a del admin a 0000
                     resetearContrasenaAdmin(this);
                 } else {
                     Toast.makeText(this, "Contraseña debe ser de 4 Numeros",

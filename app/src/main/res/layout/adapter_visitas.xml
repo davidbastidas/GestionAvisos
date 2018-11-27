@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/icono"
-            android:layout_width="48dp"
-            android:layout_height="41dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@mipmap/cliente" />
 
         <LinearLayout

@@ -37,7 +37,24 @@ public class AnomaliaActivity extends AppCompatActivity {
         l_anomalias = findViewById(R.id.l_anomalias);
 
         AnomaliasController anom = new AnomaliasController();
-        ArrayList<Anomalias> anomalias = anom.consultar(0, 0, "", this);
+        String condicion = "";
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_CONTACTO_NO_EFECTIVO){
+            condicion = "id IN(3,4,5,1)";
+        }
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_REGISTRO_NO_VALIDO){
+            condicion = "id IN(6,7,8,9)";
+        }
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_EVALUAR_CAPACIDAD_OPERATIVA){
+            condicion = "id IN(11,12,13,14)";
+        }
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_GESTION_NO_PROCEDE){
+            condicion = "id IN(12,14,24)";
+        }
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_REPROGRAMACION){
+            condicion = "id IN(1)";
+        }
+
+        ArrayList<Anomalias> anomalias = anom.consultar(0, 0, condicion, this);
         adapter = new AdapterAnomalias(this, anomalias);
         l_anomalias.setAdapter(adapter);
         l_anomalias.setOnItemClickListener(new AdapterView.OnItemClickListener() {

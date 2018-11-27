@@ -58,6 +58,8 @@ public class GestorConexion {
             obj.put("latitud", visita.getLatitud());
             obj.put("longitud", visita.getLongitud());
             obj.put("orden_realizado", visita.getOrden());
+            obj.put("fecha_realizado", visita.getFechaRealizado());
+            obj.put("foto", visita.getFoto());
             return peticionWeb(Constants.ROUTE_ACTUALIZAR_VISITA, obj);
         } catch (JSONException e) {
             return "" + e;

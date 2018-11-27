@@ -40,7 +40,6 @@ public class OperarioActivity extends AppCompatActivity {
     Button b_buscar, b_barrios, b_visitas;
     TextView t_reporte, t_acerca, t_perfil;
     ProgressDialog progressDialog = null;
-    Activity actividad;
     Visitas visitaEnviar = null;
     private int sizeVisitas = 0;
     GestorConexion conexionGestor = new GestorConexion();
@@ -49,7 +48,6 @@ public class OperarioActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operario);
-        actividad = this;
         b_buscar = findViewById(R.id.b_buscar);
         b_barrios = findViewById(R.id.b_barrios);
         b_visitas = findViewById(R.id.b_visitas);
@@ -61,22 +59,24 @@ public class OperarioActivity extends AppCompatActivity {
         b_buscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intentar = new Intent(OperarioActivity.this, BuscarActivity.class);
+                startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
             }
         });
 
         b_barrios.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intentar = new Intent(OperarioActivity.this, BarriosActivity.class);
+                startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
             }
         });
 
         b_visitas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentar = new Intent(actividad, VisitasActivity.class);
-                actividad.startActivity(intentar);
+                Intent intentar = new Intent(OperarioActivity.this, VisitasActivity.class);
+                startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
             }
         });
 
@@ -89,6 +89,7 @@ public class OperarioActivity extends AppCompatActivity {
         super.onResume();
         enviarVisitas();
         mostrarReporte();
+        VisitaSesion.resetSesion();
     }
 
     @Override
@@ -239,7 +240,7 @@ public class OperarioActivity extends AppCompatActivity {
                     JSONObject tr = jArrayVisitas.getJSONObject(i);
                     visita = new Visitas();
                     visita.setId(tr.getLong("id"));
-                    visita.setTipoVisita("");
+                    visita.setTipoVisita(tr.getString("tipo_visita"));
                     visita.setMunicipio(tr.getString("municipio"));
                     visita.setLocalidad(tr.getString("localidad"));
                     visita.setBarrio(tr.getString("barrio"));
@@ -331,13 +332,15 @@ public class OperarioActivity extends AppCompatActivity {
             visitaEnviar.setLatitud(arrayVisitas.get(i).getLatitud());
             visitaEnviar.setLongitud(arrayVisitas.get(i).getLongitud());
             visitaEnviar.setOrden(arrayVisitas.get(i).getOrden());
+            visitaEnviar.setFechaRealizado(arrayVisitas.get(i).getFechaRealizado());
+            visitaEnviar.setFoto(arrayVisitas.get(i).getFoto());
             String response = conexionGestor.enviarVisita(visitaEnviar, SesionSingleton.getInstance().getFkId());
             System.err.println("response: " + response);
             try {
                 JSONObject json_data = new JSONObject(response);
+                ContentValues registro = new ContentValues();
+                registro.put("last_insert", 1);
                 if (json_data.getBoolean("estado")) {
-                    ContentValues registro = new ContentValues();
-                    registro.put("last_insert", 1);
                     vis.actualizar(registro, "id = " + visitaEnviar.getId(), OperarioActivity.this);
                 }
             } catch (final Exception e){
@@ -359,6 +362,7 @@ public class OperarioActivity extends AppCompatActivity {
 
     private void alFinalizarSincronizacion(String result) {
         System.out.println("alFinalizarSincronizacion= " + result);
+        mostrarReporte();
         progressDialog.dismiss();
         Toast.makeText(this, result, Toast.LENGTH_LONG).show();
     }

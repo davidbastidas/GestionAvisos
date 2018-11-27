@@ -58,9 +58,9 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
     /** OPCIONES DEL GPS*/
     private ObservacionActivity listenerGps;
-    LocationManager locManager;
+    LocationManager locManager = null;
     private boolean guardadoActivo = true, pasarConPuntoelegido = false;
-    LocationListener locListener;
+    LocationListener locListener = null;
     private int ESTADO_SERVICE = 0;
     private static final int OUT_OF_SERVICE = 0;
     private static final int TEMPORARILY_UNAVAILABLE = 1;
@@ -75,12 +75,11 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         setTitle("Observacion y Otros");
 
         listenerGps = this;
-        comenzarLocalizacion();
         b_foto = findViewById(R.id.b_foto);
         b_finalizar = findViewById(R.id.b_finalizar);
         s_observacion = findViewById(R.id.s_observacion);
         e_observacion = findViewById(R.id.e_observacion);
-        if(VisitaSesion.getInstance().getObservacionAnalisis() != null){
+        if (VisitaSesion.getInstance().getObservacionAnalisis() != null) {
             e_observacion.setText(VisitaSesion.getInstance().getObservacionAnalisis());
         }
 
@@ -91,10 +90,10 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         obsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         s_observacion.setAdapter(obsAdapter);
-        if(VisitaSesion.getInstance().getObservacionRapida() != 0){
+        if (VisitaSesion.getInstance().getObservacionRapida() != 0) {
             ArrayList<ObservacionRapida> obs2 = obs.consultar(0, 0, "id=" + VisitaSesion.getInstance().getObservacionRapida(), this);
             s_observacion.setSelection(getIndex(s_observacion, obs2.get(0).getNombre()));
-        }else{
+        } else {
             ObservacionRapida ob = new ObservacionRapida();
             ob.setId(4);//sin observacion en la Base de datos
             s_observacion.setSelection(getIndex(s_observacion, "Sin observación"));
@@ -123,20 +122,38 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         b_finalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(VisitaSesion.getInstance().getFoto() != null){
-                VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
-                validarGuardarGps();
-            } else{
-                Toast.makeText(ObservacionActivity.this, "Debe tomar una foto para soporte.", Toast.LENGTH_LONG).show();
-            }
+                boolean pasaSinFoto = false;
+                VisitaSesion visi = VisitaSesion.getInstance();
+                if(visi.getAnomalia() == 10 || visi.getAnomalia() == 17 || visi.getAnomalia() == 18
+                    || visi.getAnomalia() == 19 || visi.getAnomalia() == 20 || visi.getAnomalia() == 10){
+                    pasaSinFoto = true;
+                }
+                if(pasaSinFoto){
+                    VisitaSesion.getInstance().setFoto("");
+                    VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
+                    comenzarLocalizacion();
+                    validarGuardarGps();
+                }else{
+                    if (VisitaSesion.getInstance().getFoto() != null) {
+                        if (!VisitaSesion.getInstance().getFoto().equals("")) {
+                            VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
+                            comenzarLocalizacion();
+                            validarGuardarGps();
+                        } else {
+                            Toast.makeText(ObservacionActivity.this, "Debe tomar una foto para soporte.", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(ObservacionActivity.this, "Debe tomar una foto para soporte.", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         });
     }
 
     //private method of your class
-    private int getIndex(Spinner spinner, String myString){
-        for (int i=0;i<spinner.getCount();i++){
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+    private int getIndex(Spinner spinner, String myString) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)) {
                 return i;
             }
         }
@@ -198,12 +215,13 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
         Intent returnIntent = new Intent();
         setResult(Activity.RESULT_OK, returnIntent);
+        VisitaSesion.resetSesion();
         finish();
     }
 
     private void validarGuardarGps() {
-        if(pasarConPuntoelegido){
-            if (guardadoActivo){
+        if (pasarConPuntoelegido) {
+            if (guardadoActivo) {
                 guardadoActivo = false;
                 pasarConPuntoelegido = false;
                 guardarVisita();
@@ -214,17 +232,18 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         }
     }
 
-    private void takePhoto(){
+    private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, Constants.FOTO_REQUEST_CODE);
 
     }
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case Constants.FOTO_REQUEST_CODE:
-                if (resultCode == Activity.RESULT_OK){
+                if (resultCode == Activity.RESULT_OK) {
                     Bitmap bmp = (Bitmap) data.getExtras().get("data");
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     VisitaSesion.getInstance().setFoto(BitMapToString(bmp));
@@ -237,7 +256,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     public void onBackPressed() {
         super.onBackPressed();
         VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
-        if(s_observacion.getSelectedItem() != null){
+        if (s_observacion.getSelectedItem() != null) {
             VisitaSesion.getInstance().setObservacionRapida(((ObservacionRapida) s_observacion.getSelectedItem()).getId());
         }
         Intent returnIntent = new Intent();
@@ -245,7 +264,8 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         finish();
     }
 
-    public void onStop () {
+    @Override
+    public void onStop() {
         if (locListener != null) {
             locManager.removeUpdates(locListener);
             locListener = null;
@@ -263,33 +283,37 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     }
 
     private void comenzarLocalizacion() {
-        locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if(locManager == null){
+            locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        }
         if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            locListener = new LocationListener() {
-                public void onLocationChanged(Location location) {
-                    System.out.println("onLocationChanged");
-                    LATITUD = String.valueOf(location.getLatitude());
-                    LONGITUD = String.valueOf(location.getLongitude());
-                    ACURRACY = String.valueOf(location.getAccuracy());
-                }
+            if(locListener == null){
+                locListener = new LocationListener() {
+                    public void onLocationChanged(Location location) {
+                        System.out.println("onLocationChanged");
+                        LATITUD = String.valueOf(location.getLatitude());
+                        LONGITUD = String.valueOf(location.getLongitude());
+                        ACURRACY = String.valueOf(location.getAccuracy());
+                    }
 
-                @Override
-                public void onProviderDisabled(String provider) {
-                    locManager.removeUpdates(locListener);
-                    System.out.println("onProviderDisabled");
-                }
+                    @Override
+                    public void onProviderDisabled(String provider) {
+                        locManager.removeUpdates(locListener);
+                        System.out.println("onProviderDisabled");
+                    }
 
-                @Override
-                public void onProviderEnabled(String provider) {
-                }
+                    @Override
+                    public void onProviderEnabled(String provider) {
+                    }
 
-                @Override
-                public void onStatusChanged(String provider, int status,
-                                            Bundle extras) {
-                    ESTADO_SERVICE = status;
-                    mostrarEstadoGPS();
-                }
-            };
+                    @Override
+                    public void onStatusChanged(String provider, int status,
+                                                Bundle extras) {
+                        ESTADO_SERVICE = status;
+                        mostrarEstadoGPS();
+                    }
+                };
+            }
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -301,7 +325,6 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                 return;
             }
             locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
-            //iniciarTareaGPS30Sec();
         } else {
             ActivarGPS();
         }

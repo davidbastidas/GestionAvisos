@@ -12,8 +12,8 @@
 
         <ImageView
             android:id="@+id/icono"
-            android:layout_width="?android:attr/listPreferredItemHeight"
-            android:layout_height="54dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:src="@mipmap/barrio" />
 
         <LinearLayout
@@ -25,10 +25,11 @@
             <TextView
                 android:id="@+id/t_titulo"
                 android:layout_width="match_parent"
-                android:layout_height="61dp"
+                android:layout_height="wrap_content"
                 android:singleLine="false"
                 android:text="Example"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

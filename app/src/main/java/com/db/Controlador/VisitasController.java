@@ -190,4 +190,23 @@ public class VisitasController {
 		countCursor.close();
 		return tamanoConsulta;
 	}
+
+	public synchronized ArrayList<Visitas> consultaBarrios(Activity activity){
+		Visitas dataSet;
+		ArrayList<Visitas> visitas = new ArrayList<Visitas>();
+		Cursor c = null;
+		SQLite usdbh = SQLite.getInstance(activity);
+		SQLiteDatabase db = usdbh.getMyWritableDatabase();
+		String limit = "";
+		c = db.rawQuery("SELECT barrio FROM " + Constants.TABLA_VISITAS + " GROUP BY barrio ORDER BY barrio", null);
+		if (c.moveToFirst()) {
+			do {
+				dataSet = new Visitas();
+				dataSet.setBarrio(c.getString(0));
+				visitas.add(dataSet);
+			} while (c.moveToNext());
+		}
+		c.close();
+		return visitas;
+	}
 }

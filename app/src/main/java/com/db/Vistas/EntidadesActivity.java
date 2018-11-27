@@ -44,7 +44,7 @@ public class EntidadesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_anomalia);
+        setContentView(R.layout.activity_entidades);
         setTitle("Elija un Punto de Pago");
         e_buscar_entidad = findViewById(R.id.e_buscar_entidad);
         l_entidades = findViewById(R.id.l_entidades);
@@ -98,7 +98,7 @@ public class EntidadesActivity extends AppCompatActivity {
                 //Formateo el mes obtenido: antepone el 0 si son menores de 10
                 String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
                 //Muestro la fecha con el formato deseado
-                VisitaSesion.getInstance().setFechaCompromiso(diaFormateado + BARRA + mesFormateado + BARRA + year);
+                VisitaSesion.getInstance().setFechaPago(diaFormateado + BARRA + mesFormateado + BARRA + year);
                 irDatosCliente();
             }
             //Estos valores deben ir en ese orden, de lo contrario no mostrara la fecha actual

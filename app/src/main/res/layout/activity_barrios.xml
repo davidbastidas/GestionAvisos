@@ -5,21 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
-    tools:context=".Vistas.VisitasActivity">
+    tools:context=".Vistas.ResultadoActivity">
 
-    <TextView
-        android:id="@+id/t_pagina"
+    <EditText
+        android:id="@+id/e_buscar_barrio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:ems="10"
+        android:hint="Escriba para filtrar"
+        android:inputType="textPersonName" />
 
     <ListView
-        android:id="@+id/l_visitas"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp" />
-
+        android:id="@+id/l_barrios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

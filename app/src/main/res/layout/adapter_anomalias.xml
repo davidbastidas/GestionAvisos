@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/icono"
-            android:layout_width="40dp"
-            android:layout_height="39dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:padding="3dp"
             android:src="@drawable/ic_info_black_24dp" />
 
@@ -27,10 +27,11 @@
             <TextView
                 android:id="@+id/t_titulo"
                 android:layout_width="match_parent"
-                android:layout_height="94dp"
+                android:layout_height="wrap_content"
                 android:singleLine="false"
                 android:text="Example"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
