@@ -44,11 +44,20 @@ public class DatosClienteActivity extends AppCompatActivity {
         final VisitaSesion visita = VisitaSesion.getInstance();
         VisitasController vis = new VisitasController();
         ArrayList<Visitas> visitas = vis.consultar(0, 0, "id=" + visita.getId(), this);
-        e_titular_pago.setText(visitas.get(0).getTitularPago());
+        e_titular_pago.setText(visitas.get(0).getCliente());
 
         b_ir_observacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean flag = true;
+                if(!e_telefono.getText().toString().equals("")) {
+                    if(e_telefono.getText().toString().length() == 7 || e_telefono.getText().toString().length() == 10) {
+                        flag = true;
+                    } else{
+                        flag = false;
+                        Toast.makeText(DatosClienteActivity.this, "El telefono debe ser Fijo o Celular.", Toast.LENGTH_LONG).show();
+                    }
+                }
                 if(!e_atiende.getText().toString().equals("")){
                     visita.setCedula(e_cedula.getText().toString());
                     visita.setTitularPago(e_titular_pago.getText().toString());
@@ -56,10 +65,14 @@ public class DatosClienteActivity extends AppCompatActivity {
                     visita.setTelefono(e_telefono.getText().toString());
                     visita.setEmail(e_email.getText().toString());
                     visita.setLectura(e_lectura.getText().toString());
+                } else {
+                    flag = false;
+                    Toast.makeText(DatosClienteActivity.this, "Debe ingresar la persona que atiende", Toast.LENGTH_LONG).show();
+                }
+
+                if(flag){
                     Intent intentar = new Intent(DatosClienteActivity.this, ObservacionActivity.class);
                     startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
-                } else {
-                    Toast.makeText(DatosClienteActivity.this, "Debe ingresar la persona que atiende", Toast.LENGTH_LONG).show();
                 }
             }
         });
