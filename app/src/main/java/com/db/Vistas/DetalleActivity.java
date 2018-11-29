@@ -49,7 +49,44 @@ public class DetalleActivity extends AppCompatActivity {
         }
 
         ArrayList<Visitas> data = new ArrayList<Visitas>();
-        Visitas datum = new Visitas();
+        Visitas datum = null;
+
+        datum = new Visitas();
+        datum.setCliente("NIC");
+        datum.setPersonaContacto("" + visita.getNic());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Cliente");
+        datum.setPersonaContacto(visita.getCliente());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Direccion");
+        datum.setPersonaContacto(visita.getDireccion());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Deuda");
+        datum.setPersonaContacto("" + visita.getDeuda());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Facturas");
+        datum.setPersonaContacto("" + visita.getFacturas());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Medidor");
+        datum.setPersonaContacto(visita.getMedidor());
+        data.add(datum);
+
+        datum = new Visitas();
+        datum.setCliente("Fecha Limite para Acuerdo de Pago");
+        datum.setPersonaContacto(visita.getFechaLimiteCompromiso());
+        data.add(datum);
+
+        datum = new Visitas();
         datum.setCliente("Municipio");
         datum.setPersonaContacto(visita.getMunicipio());
         data.add(datum);
@@ -65,33 +102,8 @@ public class DetalleActivity extends AppCompatActivity {
         data.add(datum);
 
         datum = new Visitas();
-        datum.setCliente("Direccion");
-        datum.setPersonaContacto(visita.getDireccion());
-        data.add(datum);
-
-        datum = new Visitas();
-        datum.setCliente("Cliente");
-        datum.setPersonaContacto(visita.getCliente());
-        data.add(datum);
-
-        datum = new Visitas();
         datum.setCliente("Tipo de Gestion");
         datum.setPersonaContacto(visita.getTipoVisita());
-        data.add(datum);
-
-        datum = new Visitas();
-        datum.setCliente("Deuda");
-        datum.setPersonaContacto("" + visita.getDeuda());
-        data.add(datum);
-
-        datum = new Visitas();
-        datum.setCliente("Facturas");
-        datum.setPersonaContacto("" + visita.getFacturas());
-        data.add(datum);
-
-        datum = new Visitas();
-        datum.setCliente("NIC");
-        datum.setPersonaContacto("" + visita.getNic());
         data.add(datum);
 
         datum = new Visitas();
@@ -100,18 +112,8 @@ public class DetalleActivity extends AppCompatActivity {
         data.add(datum);
 
         datum = new Visitas();
-        datum.setCliente("Fecha de Compromiso Limite");
-        datum.setPersonaContacto(visita.getFechaLimiteCompromiso());
-        data.add(datum);
-
-        datum = new Visitas();
         datum.setCliente("Nis");
         datum.setPersonaContacto("" + visita.getNis());
-        data.add(datum);
-
-        datum = new Visitas();
-        datum.setCliente("Medidor");
-        datum.setPersonaContacto(visita.getMedidor());
         data.add(datum);
 
         datum = new Visitas();

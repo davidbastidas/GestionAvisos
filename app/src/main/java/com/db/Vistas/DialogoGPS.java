@@ -37,7 +37,7 @@ public class DialogoGPS{
 				R.layout.gps_intentar, null);
 		gps_texto = (TextView) view.findViewById(R.id.gps_texto);
 		gps_texto.setText(
-				"¿Desea guardar estas Corrdenadas?\nLatitud: "+latitud+
+				"¿Desea guardar estas Coordenadas?\nLatitud: "+latitud+
 				"\nLongitud: "+longitud+
 				"\nPrecisión: "+acurracy+" Metros");
 		builder.setView(view);

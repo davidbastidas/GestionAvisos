@@ -235,7 +235,6 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, Constants.FOTO_REQUEST_CODE);
-
     }
 
     @Override
@@ -276,7 +275,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
     public String BitMapToString(Bitmap bitmap){
         ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,60, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100, baos);
         byte [] b = baos.toByteArray();
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
