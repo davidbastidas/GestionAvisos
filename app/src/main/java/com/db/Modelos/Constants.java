@@ -14,16 +14,26 @@ public final class Constants {
     public static final int FOTO_REQUEST_CODE = 998;
 
     /**resultados*/
-    public static final int RES_CONTACTO_NO_EFECTIVO = 1;
+    public static final int RES_PAGO_TOTAL = 12;
+    public static final int RES_ENTREGA_FACTURA = 13;
     public static final int RES_ACUERDO_PAGO = 3;
+    public static final int RES_COMPROMISO = 14;
     public static final int RES_ABONO = 4;
+    public static final int RES_CLIENTE_NO_PUEDE_PAGAR = 15;
+    public static final int RES_CLIENTE_NO_TIENE_VOLUNTAD_PAGO = 16;
+    public static final int RES_CLIENTE_CONDICIONA_PAGO = 17;
+    public static final int RES_CONTACTO_NO_EFECTIVO = 1;
     public static final int RES_CLIENTE_CANCELO = 5;
+
     public static final int RES_REGISTRO_NO_VALIDO = 6;
     public static final int RES_DEUDA_CERO = 7;
     public static final int RES_EVALUAR_CAPACIDAD_OPERATIVA = 8;
     public static final int RES_GESTION_NO_PROCEDE = 9;
     public static final int RES_EN_CURSO = 10;
     public static final int RES_REPROGRAMACION = 11;
+
+    /**anomalias*/
+    public static final int AN_OTROS = 22;
 
     public static final String EXTRA_VISITA_ID = "visita_id";
     public static final String EXTRA_NIC = "nic";

@@ -2,19 +2,18 @@ package com.db.Vistas;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,13 +23,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.db.Controlador.GestorConexion;
 import com.db.Controlador.ObservacionRapidaController;
 import com.db.Controlador.VisitasController;
 import com.db.Modelos.Constants;
@@ -39,8 +34,6 @@ import com.db.Modelos.SesionSingleton;
 import com.db.Modelos.VisitaSesion;
 import com.db.Modelos.Visitas;
 import com.db.R;
-
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -67,6 +60,32 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     private static final int AVAILABLE = 2;
     private String LONGITUD = "0.0", LATITUD = "0.0", ACURRACY = "0";
     private String LONGITUD_FINAL = "0.0", LATITUD_FINAL = "0.0", ACURRACY_FINAL = "0";
+    private int limitTimeSecond = 20;
+
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if(limitTimeSecond == 0){
+                if (locListener != null) {
+                    locManager.removeUpdates(locListener);
+                    locListener = null;
+                    locManager = null;
+                }
+                if(!b_finalizar.isEnabled()){
+                    timerHandler.removeCallbacks(timerRunnable);
+                    b_finalizar.setEnabled(true);
+                    b_finalizar.setText("FINALIZAR Y GUARDAR");
+                }
+            }else{
+                limitTimeSecond = limitTimeSecond - 1;
+                b_finalizar.setText("Esperando el Punto GPS... " + limitTimeSecond);
+
+                timerHandler.postDelayed(this, 1000);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +94,15 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         setTitle("Observacion y Otros");
 
         listenerGps = this;
+        comenzarLocalizacion();
+
+
         b_foto = findViewById(R.id.b_foto);
         b_finalizar = findViewById(R.id.b_finalizar);
         s_observacion = findViewById(R.id.s_observacion);
         e_observacion = findViewById(R.id.e_observacion);
+        b_finalizar.setEnabled(false);
+        b_finalizar.setText("Esperando el Punto GPS...");
         if (VisitaSesion.getInstance().getObservacionAnalisis() != null) {
             e_observacion.setText(VisitaSesion.getInstance().getObservacionAnalisis());
         }
@@ -122,32 +146,46 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         b_finalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean pasaSinFoto = false;
+                boolean pasa = true;
+                boolean fotoRequerida = true, observacionRequerida = false;
+                String motivo = "";
+
                 VisitaSesion visi = VisitaSesion.getInstance();
-                if(visi.getAnomalia() == 10 || visi.getAnomalia() == 17 || visi.getAnomalia() == 18
-                    || visi.getAnomalia() == 19 || visi.getAnomalia() == 20 || visi.getAnomalia() == 10){
-                    pasaSinFoto = true;
+                if(visi.getAnomalia() == 10){
+                    fotoRequerida = false;
                 }
-                if(pasaSinFoto){
-                    VisitaSesion.getInstance().setFoto("");
-                    VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
-                    comenzarLocalizacion();
-                    validarGuardarGps();
-                }else{
+
+                if(VisitaSesion.getInstance().isObservacionObligatoria()){
+                    observacionRequerida = true;
+                }
+                if(fotoRequerida){
                     if (VisitaSesion.getInstance().getFoto() != null) {
-                        if (!VisitaSesion.getInstance().getFoto().equals("")) {
-                            VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
-                            comenzarLocalizacion();
-                            validarGuardarGps();
-                        } else {
-                            Toast.makeText(ObservacionActivity.this, "Debe tomar una foto para soporte.", Toast.LENGTH_LONG).show();
+                        if (VisitaSesion.getInstance().getFoto().equals("")) {
+                            pasa = false;
+                            motivo = "Debe tomar una foto para soporte.";
                         }
                     } else {
-                        Toast.makeText(ObservacionActivity.this, "Debe tomar una foto para soporte.", Toast.LENGTH_LONG).show();
+                        pasa = false;
+                        motivo = "Debe tomar una foto para soporte.";
                     }
+                }
+                if(observacionRequerida){
+                    if (e_observacion.getText().toString().trim().equals("")) {
+                        pasa = false;
+                        motivo = "Debe escribir la observacion.";
+                    }
+                }
+
+                if(pasa){
+                    VisitaSesion.getInstance().setFoto("");
+                    VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
+                    validarGuardarGps();
+                }else{
+                    Toast.makeText(ObservacionActivity.this, motivo, Toast.LENGTH_LONG).show();
                 }
             }
         });
+        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     //private method of your class
@@ -162,6 +200,13 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     }
 
     private void guardarVisita() {
+        progressDialog = Constants.dialogIndeterminate(this, "Guardando...");
+        if(!LATITUD.equals("0.0")){
+            Toast.makeText(this, "SE CAPTURO EL PUNTO.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "SIN PUNTO GPS.", Toast.LENGTH_SHORT).show();
+        }
+
         VisitasController vis = new VisitasController();
         int orden = vis.ultimoOrden(this);
         orden = orden + 1;
@@ -216,6 +261,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         Intent returnIntent = new Intent();
         setResult(Activity.RESULT_OK, returnIntent);
         VisitaSesion.resetSesion();
+        progressDialog.dismiss();
         finish();
     }
 
@@ -246,6 +292,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                     Bitmap bmp = (Bitmap) data.getExtras().get("data");
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     VisitaSesion.getInstance().setFoto(BitMapToString(bmp));
+                    comenzarLocalizacion();
                 }
                 break;
         }
@@ -282,9 +329,9 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     }
 
     private void comenzarLocalizacion() {
-        if(locManager == null){
-            locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        }
+        locManager = null;
+        locListener = null;
+        locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             if(locListener == null){
                 locListener = new LocationListener() {
@@ -293,6 +340,11 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                         LATITUD = String.valueOf(location.getLatitude());
                         LONGITUD = String.valueOf(location.getLongitude());
                         ACURRACY = String.valueOf(location.getAccuracy());
+                        if(!b_finalizar.isEnabled()){
+                            timerHandler.removeCallbacks(timerRunnable);
+                            b_finalizar.setEnabled(true);
+                            b_finalizar.setText("FINALIZAR Y GUARDAR");
+                        }
                     }
 
                     @Override
@@ -331,14 +383,14 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
     private void mostrarEstadoGPS(){
         if(ESTADO_SERVICE==OUT_OF_SERVICE){
-            Toast.makeText(this, "Servicio GPS no disponible", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Servicio GPS no disponible", Toast.LENGTH_SHORT).show();
             System.out.println("OUT_OF_SERVICE");
         } else if(ESTADO_SERVICE==TEMPORARILY_UNAVAILABLE){
             System.out.println("TEMPORARILY_UNAVAILABLE");
-            Toast.makeText(this, "Servicio GPS no disponible", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Servicio GPS no disponible", Toast.LENGTH_SHORT).show();
         } else if(ESTADO_SERVICE==AVAILABLE){
             System.out.println("AVAILABLE");
-            Toast.makeText(this, "GPS Disponible", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "GPS Disponible", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -349,16 +401,20 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                 android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        this.startActivityForResult(settingsIntent, 0);
+        this.startActivityForResult(settingsIntent, 1);
     }
 
     @Override
     public void onGuardarConPuntoElegido(String latitud,String longitud,String acurracy) {
-        pasarConPuntoelegido = true;
-        LONGITUD_FINAL = longitud;
-        LATITUD_FINAL = latitud;
-        ACURRACY_FINAL = acurracy;
-        validarGuardarGps();
+        if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            pasarConPuntoelegido = true;
+            LONGITUD_FINAL = longitud;
+            LATITUD_FINAL = latitud;
+            ACURRACY_FINAL = acurracy;
+            validarGuardarGps();
+        } else {
+            ActivarGPS();
+        }
     }
 
     @Override

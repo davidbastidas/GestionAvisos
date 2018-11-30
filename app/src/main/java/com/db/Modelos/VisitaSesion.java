@@ -52,6 +52,8 @@ public class VisitaSesion {
     private long estado;
     private long lastInsert;
 
+    private boolean observacionObligatoria;
+
     public long getId() {
         return id;
     }
@@ -338,5 +340,13 @@ public class VisitaSesion {
 
     public void setLastInsert(long lastInsert) {
         this.lastInsert = lastInsert;
+    }
+
+    public boolean isObservacionObligatoria() {
+        return observacionObligatoria;
+    }
+
+    public void setObservacionObligatoria(boolean observacionObligatoria) {
+        this.observacionObligatoria = observacionObligatoria;
     }
 }

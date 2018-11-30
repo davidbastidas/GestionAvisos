@@ -1,7 +1,9 @@
 package com.db.Vistas;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -79,24 +81,25 @@ public class ResultadoActivity extends AppCompatActivity {
         VisitaSesion visita = VisitaSesion.getInstance();
         Class actividad = null;
         switch ((int) id){
-            case Constants.RES_CONTACTO_NO_EFECTIVO:
-                visita.setResultado(Constants.RES_CONTACTO_NO_EFECTIVO);
+            case Constants.RES_PAGO_TOTAL:
+                visita.setResultado(Constants.RES_PAGO_TOTAL);
+                visita.setAnomalia(10);
+                actividad = EntidadesActivity.class;
+                break;
+            case Constants.RES_ENTREGA_FACTURA:
+                visita.setResultado(Constants.RES_ENTREGA_FACTURA);
                 visita.setEntidadRecaudo(0);
-
-                visita.setCedula("");
-                visita.setTitularPago("");
-                visita.setPersonaContacto("");
-                visita.setTelefono("");
-                visita.setEmail("");
-                visita.setLectura("");
-                visita.setFechaCompromiso("");
-                visita.setFechaPago("");
-
-                actividad = AnomaliaActivity.class;
+                visita.setAnomalia(10);
+                actividad = DatosClienteActivity.class;
                 break;
             case Constants.RES_ACUERDO_PAGO:
-                //la fecha se toma de la fecha precargada
                 visita.setResultado(Constants.RES_ACUERDO_PAGO);
+                visita.setAnomalia(10);
+                actividad = EntidadesActivity.class;
+                break;
+            case Constants.RES_COMPROMISO:
+                //la fecha se toma de la fecha precargada
+                visita.setResultado(Constants.RES_COMPROMISO);
                 visita.setEntidadRecaudo(0);
                 visita.setAnomalia(10);
                 VisitasController vis = new VisitasController();
@@ -119,6 +122,48 @@ public class ResultadoActivity extends AppCompatActivity {
                 visita.setResultado(Constants.RES_ABONO);
                 visita.setAnomalia(10);
                 actividad = EntidadesActivity.class;
+                break;
+            case Constants.RES_CLIENTE_NO_PUEDE_PAGAR:
+                visita.setResultado(Constants.RES_CLIENTE_NO_PUEDE_PAGAR);
+                visita.setEntidadRecaudo(0);
+                visita.setAnomalia(10);
+                actividad = DatosClienteActivity.class;
+                break;
+            case Constants.RES_CLIENTE_NO_TIENE_VOLUNTAD_PAGO:
+                visita.setResultado(Constants.RES_CLIENTE_NO_TIENE_VOLUNTAD_PAGO);
+                visita.setEntidadRecaudo(0);
+                visita.setAnomalia(10);
+                actividad = DatosClienteActivity.class;
+                break;
+            case Constants.RES_CLIENTE_CONDICIONA_PAGO:
+                visita.setResultado(Constants.RES_CLIENTE_CONDICIONA_PAGO);
+                visita.setEntidadRecaudo(0);
+
+                visita.setCedula("");
+                visita.setTitularPago("");
+                visita.setPersonaContacto("");
+                visita.setTelefono("");
+                visita.setEmail("");
+                visita.setLectura("");
+                visita.setFechaCompromiso("");
+                visita.setFechaPago("");
+
+                actividad = AnomaliaActivity.class;
+                break;
+            case Constants.RES_CONTACTO_NO_EFECTIVO:
+                visita.setResultado(Constants.RES_CONTACTO_NO_EFECTIVO);
+                visita.setEntidadRecaudo(0);
+
+                visita.setCedula("");
+                visita.setTitularPago("");
+                visita.setPersonaContacto("");
+                visita.setTelefono("");
+                visita.setEmail("");
+                visita.setLectura("");
+                visita.setFechaCompromiso("");
+                visita.setFechaPago("");
+
+                actividad = AnomaliaActivity.class;
                 break;
             case Constants.RES_CLIENTE_CANCELO:
                 visita.setResultado(Constants.RES_CLIENTE_CANCELO);
@@ -208,9 +253,14 @@ public class ResultadoActivity extends AppCompatActivity {
                 actividad = AnomaliaActivity.class;
                 break;
         }
-
-        Intent intentar = new Intent(this, actividad);
-        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+        LocationManager locManager = null;
+        locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Intent intentar = new Intent(this, actividad);
+            startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+        } else {
+            ActivarGPS();
+        }
     }
 
     @Override
@@ -230,5 +280,15 @@ public class ResultadoActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         setResult(Activity.RESULT_CANCELED, returnIntent);
         finish();
+    }
+
+    private void ActivarGPS() {
+        Toast.makeText(this, "Por favor active su GPS", Toast.LENGTH_SHORT)
+                .show();
+        Intent settingsIntent = new Intent(
+                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        this.startActivityForResult(settingsIntent, 1);
     }
 }

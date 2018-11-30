@@ -39,7 +39,7 @@ public class AnomaliaActivity extends AppCompatActivity {
         AnomaliasController anom = new AnomaliasController();
         String condicion = "";
         if(VisitaSesion.getInstance().getResultado() == Constants.RES_CONTACTO_NO_EFECTIVO){
-            condicion = "id IN(3,4,5,1)";
+            condicion = "id IN(2,3,4,5,1)";
         }
         if(VisitaSesion.getInstance().getResultado() == Constants.RES_REGISTRO_NO_VALIDO){
             condicion = "id IN(6,7,8,9)";
@@ -49,6 +49,9 @@ public class AnomaliaActivity extends AppCompatActivity {
         }
         if(VisitaSesion.getInstance().getResultado() == Constants.RES_GESTION_NO_PROCEDE){
             condicion = "id IN(12,14,24)";
+        }
+        if(VisitaSesion.getInstance().getResultado() == Constants.RES_CLIENTE_CONDICIONA_PAGO){
+            condicion = "id IN(11,16,17,18,19,20,21,22,23)";
         }
         if(VisitaSesion.getInstance().getResultado() == Constants.RES_REPROGRAMACION){
             condicion = "id IN(1)";
@@ -64,8 +67,18 @@ public class AnomaliaActivity extends AppCompatActivity {
                 try {
                     Anomalias anomalia = (Anomalias) parent.getItemAtPosition(position);
                     VisitaSesion.getInstance().setAnomalia(anomalia.getId());
-                    Intent intentar = new Intent(AnomaliaActivity.this, ObservacionActivity.class);
-                    startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    if(anomalia.getId() == Constants.AN_OTROS){
+                        VisitaSesion.getInstance().setObservacionObligatoria(true);
+                    } else {
+                        VisitaSesion.getInstance().setObservacionObligatoria(false);
+                    }
+                    if(VisitaSesion.getInstance().getResultado() == Constants.RES_CLIENTE_CONDICIONA_PAGO){
+                        Intent intentar = new Intent(AnomaliaActivity.this, DatosClienteActivity.class);
+                        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    } else {
+                        Intent intentar = new Intent(AnomaliaActivity.this, ObservacionActivity.class);
+                        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    }
                 } catch (Exception ex) {
                     Toast.makeText(AnomaliaActivity.this, "Error en anomalia: " + ex, Toast.LENGTH_LONG).show();
                 }
