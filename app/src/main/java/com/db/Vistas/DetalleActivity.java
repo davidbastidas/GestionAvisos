@@ -187,8 +187,12 @@ public class DetalleActivity extends AppCompatActivity {
         b_ir_resultado.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentar = new Intent(DetalleActivity.this, ResultadoActivity.class);
-                startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                if (Constants.isGpsActivo(DetalleActivity.this)) {
+                    Intent intentar = new Intent(DetalleActivity.this, ResultadoActivity.class);
+                    startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                } else {
+                    Constants.ActivarGPS(DetalleActivity.this);
+                }
             }
         });
     }

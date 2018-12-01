@@ -253,13 +253,11 @@ public class ResultadoActivity extends AppCompatActivity {
                 actividad = AnomaliaActivity.class;
                 break;
         }
-        LocationManager locManager = null;
-        locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (Constants.isGpsActivo(this)) {
             Intent intentar = new Intent(this, actividad);
             startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
         } else {
-            ActivarGPS();
+            Constants.ActivarGPS(this);
         }
     }
 
@@ -282,13 +280,5 @@ public class ResultadoActivity extends AppCompatActivity {
         finish();
     }
 
-    private void ActivarGPS() {
-        Toast.makeText(this, "Por favor active su GPS", Toast.LENGTH_SHORT)
-                .show();
-        Intent settingsIntent = new Intent(
-                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        this.startActivityForResult(settingsIntent, 1);
-    }
+
 }

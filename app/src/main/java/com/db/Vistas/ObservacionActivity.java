@@ -60,7 +60,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     private static final int AVAILABLE = 2;
     private String LONGITUD = "0.0", LATITUD = "0.0", ACURRACY = "0";
     private String LONGITUD_FINAL = "0.0", LATITUD_FINAL = "0.0", ACURRACY_FINAL = "0";
-    private int limitTimeSecond = 20;
+    private int limitTimeSecond = 30;
 
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -68,13 +68,9 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         @Override
         public void run() {
             if(limitTimeSecond == 0){
-                if (locListener != null) {
-                    locManager.removeUpdates(locListener);
-                    locListener = null;
-                    locManager = null;
-                }
                 if(!b_finalizar.isEnabled()){
                     timerHandler.removeCallbacks(timerRunnable);
+                    b_foto.setEnabled(true);
                     b_finalizar.setEnabled(true);
                     b_finalizar.setText("FINALIZAR Y GUARDAR");
                 }
@@ -101,6 +97,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         b_finalizar = findViewById(R.id.b_finalizar);
         s_observacion = findViewById(R.id.s_observacion);
         e_observacion = findViewById(R.id.e_observacion);
+        b_foto.setEnabled(false);
         b_finalizar.setEnabled(false);
         b_finalizar.setText("Esperando el Punto GPS...");
         if (VisitaSesion.getInstance().getObservacionAnalisis() != null) {
@@ -292,7 +289,6 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                     Bitmap bmp = (Bitmap) data.getExtras().get("data");
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     VisitaSesion.getInstance().setFoto(BitMapToString(bmp));
-                    comenzarLocalizacion();
                 }
                 break;
         }
@@ -329,8 +325,6 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     }
 
     private void comenzarLocalizacion() {
-        locManager = null;
-        locListener = null;
         locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             if(locListener == null){
@@ -342,6 +336,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                         ACURRACY = String.valueOf(location.getAccuracy());
                         if(!b_finalizar.isEnabled()){
                             timerHandler.removeCallbacks(timerRunnable);
+                            b_foto.setEnabled(true);
                             b_finalizar.setEnabled(true);
                             b_finalizar.setText("FINALIZAR Y GUARDAR");
                         }
@@ -406,15 +401,11 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
     @Override
     public void onGuardarConPuntoElegido(String latitud,String longitud,String acurracy) {
-        if(locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            pasarConPuntoelegido = true;
-            LONGITUD_FINAL = longitud;
-            LATITUD_FINAL = latitud;
-            ACURRACY_FINAL = acurracy;
-            validarGuardarGps();
-        } else {
-            ActivarGPS();
-        }
+        pasarConPuntoelegido = true;
+        LONGITUD_FINAL = longitud;
+        LATITUD_FINAL = latitud;
+        ACURRACY_FINAL = acurracy;
+        validarGuardarGps();
     }
 
     @Override

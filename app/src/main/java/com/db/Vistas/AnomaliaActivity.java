@@ -72,13 +72,18 @@ public class AnomaliaActivity extends AppCompatActivity {
                     } else {
                         VisitaSesion.getInstance().setObservacionObligatoria(false);
                     }
-                    if(VisitaSesion.getInstance().getResultado() == Constants.RES_CLIENTE_CONDICIONA_PAGO){
-                        Intent intentar = new Intent(AnomaliaActivity.this, DatosClienteActivity.class);
-                        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    if (Constants.isGpsActivo(AnomaliaActivity.this)) {
+                        if(VisitaSesion.getInstance().getResultado() == Constants.RES_CLIENTE_CONDICIONA_PAGO){
+                            Intent intentar = new Intent(AnomaliaActivity.this, DatosClienteActivity.class);
+                            startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                        } else {
+                            Intent intentar = new Intent(AnomaliaActivity.this, ObservacionActivity.class);
+                            startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                        }
                     } else {
-                        Intent intentar = new Intent(AnomaliaActivity.this, ObservacionActivity.class);
-                        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                        Constants.ActivarGPS(AnomaliaActivity.this);
                     }
+
                 } catch (Exception ex) {
                     Toast.makeText(AnomaliaActivity.this, "Error en anomalia: " + ex, Toast.LENGTH_LONG).show();
                 }

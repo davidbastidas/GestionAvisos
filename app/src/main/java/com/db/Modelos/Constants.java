@@ -1,7 +1,11 @@
 package com.db.Modelos;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -82,4 +86,24 @@ public final class Constants {
     public static final String MSG_PETICION_RECHAZADA = "Peticion Rechazada.";
     public static final String MSG_LEYENDO_DATOS = "Ocurrio un error leyendo los datos ";
     public static final String MSG_ENVIO_VISITA = "Visita enviada con exito!.";
+
+    public static boolean isGpsActivo(Activity actividad){
+        boolean status = false;
+        LocationManager locManager = null;
+        locManager = (LocationManager) actividad.getSystemService(Context.LOCATION_SERVICE);
+        if (locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            status = true;
+        }
+        return status;
+    }
+
+    public static void ActivarGPS(Activity actividad) {
+        Toast.makeText(actividad, "Por favor active su GPS", Toast.LENGTH_SHORT)
+                .show();
+        Intent settingsIntent = new Intent(
+                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        actividad.startActivityForResult(settingsIntent, 1);
+    }
 }

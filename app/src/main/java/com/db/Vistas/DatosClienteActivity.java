@@ -71,8 +71,12 @@ public class DatosClienteActivity extends AppCompatActivity {
                 }
 
                 if(flag){
-                    Intent intentar = new Intent(DatosClienteActivity.this, ObservacionActivity.class);
-                    startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    if (Constants.isGpsActivo(DatosClienteActivity.this)) {
+                        Intent intentar = new Intent(DatosClienteActivity.this, ObservacionActivity.class);
+                        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+                    } else {
+                        Constants.ActivarGPS(DatosClienteActivity.this);
+                    }
                 }
             }
         });

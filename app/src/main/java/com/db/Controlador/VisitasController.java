@@ -198,7 +198,7 @@ public class VisitasController {
 		SQLite usdbh = SQLite.getInstance(activity);
 		SQLiteDatabase db = usdbh.getMyWritableDatabase();
 		String limit = "";
-		c = db.rawQuery("SELECT barrio FROM " + Constants.TABLA_VISITAS + " GROUP BY barrio ORDER BY barrio", null);
+		c = db.rawQuery("SELECT barrio FROM " + Constants.TABLA_VISITAS + " WHERE estado = 0 GROUP BY barrio ORDER BY barrio", null);
 		if (c.moveToFirst()) {
 			do {
 				dataSet = new Visitas();

@@ -55,6 +55,9 @@ public class OperarioActivity extends AppCompatActivity {
         t_acerca = findViewById(R.id.t_acerca);
         t_perfil = findViewById(R.id.t_perfil);
         t_perfil.setText("Bienvenido. " + SesionSingleton.getInstance().getNombreUsuario());
+        if(SesionSingleton.getInstance().getNombreUsuario() == null){
+            finish();
+        }
 
         b_buscar.setOnClickListener(new View.OnClickListener() {
             @Override

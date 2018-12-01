@@ -2,7 +2,9 @@ package com.db.Vistas;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -83,8 +85,12 @@ public class EntidadesActivity extends AppCompatActivity {
     }
 
     private void irDatosCliente(){
-        Intent intentar = new Intent(EntidadesActivity.this, DatosClienteActivity.class);
-        startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+        if (Constants.isGpsActivo(this)) {
+            Intent intentar = new Intent(EntidadesActivity.this, DatosClienteActivity.class);
+            startActivityForResult(intentar, Constants.VISITA_REQUEST_CODE);
+        } else {
+            Constants.ActivarGPS(this);
+        }
     }
 
     private void obtenerFecha(){
