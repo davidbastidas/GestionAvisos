@@ -8,14 +8,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.view.View;
@@ -35,7 +39,15 @@ import com.db.Modelos.VisitaSesion;
 import com.db.Modelos.Visitas;
 import com.db.R;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +94,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
             }
         }
     };
+    private File photoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +187,6 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                 }
 
                 if(pasa){
-                    VisitaSesion.getInstance().setFoto("");
                     VisitaSesion.getInstance().setObservacionAnalisis(e_observacion.getText().toString());
                     validarGuardarGps();
                 }else{
@@ -277,6 +289,13 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
 
     private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+        }
+        Uri outputFileUri = Uri.fromFile(photoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         startActivityForResult(intent, Constants.FOTO_REQUEST_CODE);
     }
 
@@ -286,9 +305,21 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
         switch (requestCode) {
             case Constants.FOTO_REQUEST_CODE:
                 if (resultCode == Activity.RESULT_OK) {
-                    Bitmap bmp = (Bitmap) data.getExtras().get("data");
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    VisitaSesion.getInstance().setFoto(BitMapToString(bmp));
+                    try {
+                        Bitmap b = BitmapFactory.decodeFile(mCurrentPhotoPath);
+                        Bitmap out = Bitmap.createScaledBitmap(b, 640, 480, false);
+                        FileOutputStream fOut = new FileOutputStream(photoFile);
+                        out.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                        fOut.flush();
+                        fOut.close();
+                        b.recycle();
+                        out.recycle();
+
+                        VisitaSesion.getInstance().setFoto(getStringFromFile(photoFile));
+                    } catch (Exception e) {
+                        System.err.println("Error foto: " + e);
+                    }
+
                 }
                 break;
         }
@@ -317,8 +348,8 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     }
 
     public String BitMapToString(Bitmap bitmap){
-        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100, baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,80, baos);
         byte [] b = baos.toByteArray();
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
@@ -412,5 +443,43 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
     public void onSeguirIntentandoGPS() {
         pasarConPuntoelegido = false;
         validarGuardarGps();
+    }
+
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private String getStringFromFile(File file) throws Exception {
+        InputStream in = new FileInputStream(file);
+        byte[] bytes;
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try{
+            while ((bytesRead = in.read(buffer)) != -1){
+                output.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        bytes = output.toByteArray();
+        String ret = Base64.encodeToString(bytes, Base64.DEFAULT);
+        //Make sure you close all streams.
+        in.close();
+        return ret;
     }
 }

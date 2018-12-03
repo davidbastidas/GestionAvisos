@@ -81,7 +81,7 @@ public final class Constants {
     }
 
     /** mensajes estandar*/
-    public static final String MSG_FORMATO_NO_VALIDO = "El formato de respuesta no es valido.";
+    public static final String MSG_FORMATO_NO_VALIDO = "La peticion no se realizo. Verifique su conexion o Contacte al administrador.";
     public static final String MSG_SINCRONIZACION = "La visita no se pudo enviar.";
     public static final String MSG_PETICION_RECHAZADA = "Peticion Rechazada.";
     public static final String MSG_LEYENDO_DATOS = "Ocurrio un error leyendo los datos ";
