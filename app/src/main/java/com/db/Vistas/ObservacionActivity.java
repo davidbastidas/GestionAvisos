@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -30,6 +31,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.db.BuildConfig;
 import com.db.Controlador.ObservacionRapidaController;
 import com.db.Controlador.VisitasController;
 import com.db.Modelos.Constants;
@@ -294,7 +296,14 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
             photoFile = createImageFile();
         } catch (IOException ex) {
         }
-        Uri outputFileUri = Uri.fromFile(photoFile);
+        Uri outputFileUri = null;
+        if (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.N) {
+            outputFileUri = FileProvider.getUriForFile(this,
+                    BuildConfig.APPLICATION_ID + ".provider",
+                    photoFile);
+        } else{
+            outputFileUri = Uri.fromFile(photoFile);
+        }
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         startActivityForResult(intent, Constants.FOTO_REQUEST_CODE);
     }
