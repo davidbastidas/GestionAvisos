@@ -37,7 +37,7 @@ public class AdapterVisitas extends BaseAdapter implements Filterable {
 		titulo = view.findViewById(R.id.t_titulo);
 		barrio = view.findViewById(R.id.t_subtitulo);
 		titulo.setText(visitas.get(position).getDireccion().toUpperCase());
-		barrio.setText(visitas.get(position).getBarrio().toUpperCase());
+		barrio.setText(visitas.get(position).getBarrio().toUpperCase() + " - NIC: " + visitas.get(position).getNic());
 		return view;
 	}
 

@@ -316,7 +316,7 @@ public class ObservacionActivity extends AppCompatActivity implements DialogoGPS
                 if (resultCode == Activity.RESULT_OK) {
                     try {
                         Bitmap b = BitmapFactory.decodeFile(mCurrentPhotoPath);
-                        Bitmap out = Bitmap.createScaledBitmap(b, 640, 480, false);
+                        Bitmap out = Bitmap.createScaledBitmap(b, 480, 640, false);
                         FileOutputStream fOut = new FileOutputStream(photoFile);
                         out.compress(Bitmap.CompressFormat.PNG, 100, fOut);
                         fOut.flush();

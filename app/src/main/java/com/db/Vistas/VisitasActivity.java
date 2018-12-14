@@ -40,7 +40,7 @@ public class VisitasActivity extends AppCompatActivity {
         if(extras == null) {
             cargarLista();
         } else {
-            if(!extras.getString(Constants.EXTRA_BARRIO).equals("")){//por barrio
+            if (extras.containsKey(Constants.EXTRA_BARRIO)) {
                 String barrio = extras.getString(Constants.EXTRA_BARRIO);
                 barrio = " and barrio like '%" + barrio + "%'";
                 vis = new VisitasController();
@@ -53,35 +53,37 @@ public class VisitasActivity extends AppCompatActivity {
                 AdapterVisitas adapter = new AdapterVisitas(this, visitas);
                 l_visitas.setAdapter(adapter);
                 t_pagina.setText(visitas.size() + " Visitas por Barrio");
-            } else{
+            }else if (extras.containsKey(Constants.EXTRA_NIC)) {
                 String nic = extras.getString(Constants.EXTRA_NIC);
                 String medidor = extras.getString(Constants.EXTRA_MEDIDOR);
                 String direccion = extras.getString(Constants.EXTRA_DIRECCION);
                 boolean realizados = extras.getBoolean(Constants.EXTRA_REALIZADO);
 
-                if(!nic.equals("")){
-                    nic = " and nic like '%" + nic + "%'";
+                String sql = "";
+                if(!direccion.equals("")){
+                    sql = " and direccion like '%" + direccion + "%'";
                 }
                 if(!medidor.equals("")){
-                    medidor = " and medidor like '%" + medidor + "%'";
+                    sql = " and medidor like '%" + medidor + "%'";
                 }
-                if(!direccion.equals("")){
-                    direccion = " and direccion like '%" + direccion + "%'";
+                if(!nic.equals("")){
+                    sql = " and nic like '%" + nic + "%'";
                 }
+
                 int rel = 0;
                 if(realizados){
                     rel = 1;
                 }
                 vis = new VisitasController();
-                System.err.println("buscar: " + nic + medidor  + direccion + rel);
+                System.err.println("buscar: " + sql + rel);
                 ArrayList<Visitas> visitas = vis.consultar(
                         0,
                         0,
-                        "estado = " + rel + nic + medidor + direccion,
+                        "estado = " + rel + sql,
                         this);
                 AdapterVisitas adapter = new AdapterVisitas(this, visitas);
                 l_visitas.setAdapter(adapter);
-                t_pagina.setText(visitas.size() + " Visitas Encontradas");
+                t_pagina.setText(visitas.size() + " Visita(s) Encontrada(s)");
             }
         }
 

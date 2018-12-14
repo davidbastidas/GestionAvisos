@@ -11,8 +11,16 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.db.Controlador.AnomaliasController;
+import com.db.Controlador.EntidadesPagoController;
+import com.db.Controlador.ObservacionRapidaController;
+import com.db.Controlador.ResultadosController;
 import com.db.Controlador.VisitasController;
+import com.db.Modelos.Anomalias;
 import com.db.Modelos.Constants;
+import com.db.Modelos.EntidadesPago;
+import com.db.Modelos.ObservacionRapida;
+import com.db.Modelos.Resultados;
 import com.db.Modelos.Visitas;
 import com.db.R;
 import com.db.Vistas.Adaptader.AdapterDetalleVisita;
@@ -153,7 +161,13 @@ public class DetalleActivity extends AppCompatActivity {
 
         datum = new Visitas();
         datum.setCliente("Observaciones");
-        datum.setPersonaContacto("" + visita.getObservacionRapida());
+        String obsRapida = "";
+        if(visita.getObservacionRapida() != 0){
+            ObservacionRapidaController oc = new ObservacionRapidaController();
+            ArrayList<ObservacionRapida> consultar = oc.consultar(0, 0, "id = " + visita.getObservacionRapida(), this);
+            obsRapida = consultar.get(0).getNombre();
+        }
+        datum.setPersonaContacto("" + obsRapida);
         data.add(datum);
 
         datum = new Visitas();
@@ -163,17 +177,35 @@ public class DetalleActivity extends AppCompatActivity {
 
         datum = new Visitas();
         datum.setCliente("Anomalia");
-        datum.setPersonaContacto("" + visita.getAnomalia());
+        String anomalia = "";
+        if(visita.getAnomalia() != 0){
+            AnomaliasController an = new AnomaliasController();
+            ArrayList<Anomalias> consultar = an.consultar(0, 0, "id = " + visita.getAnomalia(), this);
+            anomalia = consultar.get(0).getNombre();
+        }
+        datum.setPersonaContacto("" + anomalia);
         data.add(datum);
 
         datum = new Visitas();
         datum.setCliente("Resultado");
-        datum.setPersonaContacto("" + visita.getResultado());
+        String resultado = "";
+        if(visita.getResultado() != 0){
+            ResultadosController rs = new ResultadosController();
+            ArrayList<Resultados> consultar = rs.consultar(0, 0, "id = " + visita.getResultado(), this);
+            resultado = consultar.get(0).getNombre();
+        }
+        datum.setPersonaContacto("" + resultado);
         data.add(datum);
 
         datum = new Visitas();
         datum.setCliente("Entidad de Recaudo");
-        datum.setPersonaContacto("" + visita.getEntidadRecaudo());
+        String entidad = "";
+        if(visita.getEntidadRecaudo() != 0){
+            EntidadesPagoController rs = new EntidadesPagoController();
+            ArrayList<EntidadesPago> consultar = rs.consultar(0, 0, "id = " + visita.getEntidadRecaudo(), this);
+            entidad = consultar.get(0).getNombre();
+        }
+        datum.setPersonaContacto("" + entidad);
         data.add(datum);
 
         datum = new Visitas();
@@ -183,6 +215,10 @@ public class DetalleActivity extends AppCompatActivity {
 
         AdapterDetalleVisita adapter = new AdapterDetalleVisita(this, data);
         l_detalle.setAdapter(adapter);
+
+        if(visita.getEstado() != 0){
+            b_ir_resultado.setEnabled(false);
+        }
 
         b_ir_resultado.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,8 +52,22 @@ public class AdminActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                VisitasController vis = new VisitasController();
-                                vis.eliminarTodo(AdminActivity.this);
+                                new AsyncTask<String, Void, String>(){
+                                    @Override
+                                    protected String doInBackground(String... params) {
+                                        VisitasController vis = new VisitasController();
+                                        vis.eliminarTodo(AdminActivity.this);
+                                        return "";
+                                    }
+                                    @Override
+                                    protected void onPostExecute(String result) {
+                                        Toast.makeText(
+                                                AdminActivity.this,
+                                                "Se BORRARON las visitas",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                }.execute();
+
                                 break;
 
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -80,6 +95,10 @@ public class AdminActivity extends AppCompatActivity {
                 editor.commit();
                 sesion.setIp(e_ip.getText().toString());
                 sesion.setRuta(e_ruta_web.getText().toString());
+                Toast.makeText(
+                        AdminActivity.this,
+                        "Se guardo la configuracion.",
+                        Toast.LENGTH_LONG).show();
 
                 finish();
             }
@@ -93,17 +112,27 @@ public class AdminActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                VisitasController vis = new VisitasController();
-                                ArrayList<Visitas> consultar = vis.consultar(0, 0, "", AdminActivity.this);
-                                ContentValues registro = new ContentValues();
-                                registro.put("last_insert", 0);
-                                for (int i = 0; i < consultar.size(); i++){
-                                    vis.actualizar(registro, "id = " + consultar.get(i).getId(), AdminActivity.this);
-                                }
-                                Toast.makeText(
-                                        AdminActivity.this,
-                                        "Se restablecieron las visitas",
-                                        Toast.LENGTH_LONG).show();
+                                new AsyncTask<String, Void, String>(){
+                                    @Override
+                                    protected String doInBackground(String... params) {
+                                        VisitasController vis = new VisitasController();
+                                        ArrayList<Visitas> consultar = vis.consultar(0, 0, "", AdminActivity.this);
+                                        ContentValues registro = new ContentValues();
+                                        registro.put("last_insert", 0);
+                                        for (int i = 0; i < consultar.size(); i++){
+                                            vis.actualizar(registro, "id = " + consultar.get(i).getId(), AdminActivity.this);
+                                        }
+                                        return "";
+                                    }
+                                    @Override
+                                    protected void onPostExecute(String result) {
+                                        Toast.makeText(
+                                                AdminActivity.this,
+                                                "Se restablecieron las visitas",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                }.execute();
+
                                 break;
 
                             case DialogInterface.BUTTON_NEGATIVE:
