@@ -141,7 +141,7 @@ public class OperarioActivity extends AppCompatActivity {
 
     private void acercaDe(){
         t_acerca.setText(
-                "Gestion de Avisos Version 1.1 2018-12-01 08:00:00"
+                "Gestion de Avisos Version " + Constants.VERSION_SISTEMA + " 15/12/2018 08:00:00"
         );
     }
 

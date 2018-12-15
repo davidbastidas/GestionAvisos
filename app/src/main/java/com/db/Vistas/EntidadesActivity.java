@@ -25,6 +25,7 @@ import com.db.Vistas.Adaptader.AdapterEntidades;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class EntidadesActivity extends AppCompatActivity {
 
@@ -104,7 +105,10 @@ public class EntidadesActivity extends AppCompatActivity {
                 //Formateo el mes obtenido: antepone el 0 si son menores de 10
                 String mesFormateado = (mesActual < 10)? CERO + String.valueOf(mesActual):String.valueOf(mesActual);
                 //Muestro la fecha con el formato deseado
-                VisitaSesion.getInstance().setFechaPago(diaFormateado + BARRA + mesFormateado + BARRA + year);
+
+                String fechaElegida = diaFormateado + BARRA + mesFormateado + BARRA + year;
+                VisitaSesion.getInstance().setFechaPago(fechaElegida);
+                Toast.makeText(EntidadesActivity.this, "Pago en la fecha " + fechaElegida, Toast.LENGTH_LONG).show();
                 irDatosCliente();
             }
             //Estos valores deben ir en ese orden, de lo contrario no mostrara la fecha actual
@@ -112,6 +116,7 @@ public class EntidadesActivity extends AppCompatActivity {
              *También puede cargar los valores que usted desee
              */
         },anio, mes, dia);
+        recogerFecha.getDatePicker().setMaxDate(new Date().getTime());
         //Muestro el widget
         recogerFecha.show();
     }

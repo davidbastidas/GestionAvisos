@@ -13,6 +13,8 @@ public final class Constants {
 
     private static SesionSingleton sesion = SesionSingleton.getInstance();
 
+    public static final String VERSION_SISTEMA = "1.2";
+
     public static final int PERMISOS_REQUEST_CODE = 100;
     public static final int VISITA_REQUEST_CODE = 999;
     public static final int FOTO_REQUEST_CODE = 998;
